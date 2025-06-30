@@ -19,6 +19,8 @@ public class Jogador {
         this.preso = false;
         this.tentativasPrisao = 0;
     }
+    public void setNome(String nome) { this.nome = nome; }
+    public void setSaldo(double saldo) { this.saldo = saldo; }
 
     public String getNome() { return nome; }
     public double getSaldo() { return saldo; }
@@ -90,15 +92,99 @@ public class Jogador {
 
     public void menuNegociacao(Scanner scanner, List<Jogador> jogadores, Tabuleiro tabuleiro) {
         System.out.println("--- Negociar com outro jogador ---");
-        for (int i = 0; i < jogadores.size(); i++) {
-            if (!jogadores.get(i).equals(this) && !jogadores.get(i).isFalido())
-                System.out.println((i + 1) + ". " + jogadores.get(i).getNome());
+        List<Jogador> disponiveis = new ArrayList<>();
+        for (Jogador j : jogadores) {
+            if (!j.equals(this) && !j.isFalido())
+                disponiveis.add(j);
         }
-        System.out.println("Escolha o número ou 0 para sair:");
-        int escolha = Integer.parseInt(scanner.nextLine());
-        if (escolha < 1 || escolha > jogadores.size() || jogadores.get(escolha - 1).equals(this)) return;
-        Jogador alvo = jogadores.get(escolha - 1);
-        // Aqui pode implementar lógica de negociação (oferecer/vender propriedades, dinheiro etc)
-        System.out.println("Negociação entre " + nome + " e " + alvo.getNome() + " (funcionalidade em desenvolvimento)");
+        if (disponiveis.isEmpty()) {
+            System.out.println("Nenhum jogador disponível para negociar.");
+            return;
+        }
+        for (int i = 0; i < disponiveis.size(); i++)
+            System.out.println((i + 1) + ". " + disponiveis.get(i).getNome());
+        System.out.println("Escolha o número do jogador ou 0 para sair:");
+        int escolha;
+        try {
+            escolha = Integer.parseInt(scanner.nextLine());
+        } catch (Exception e) { return; }
+        if (escolha < 1 || escolha > disponiveis.size()) return;
+        Jogador alvo = disponiveis.get(escolha - 1);
+
+        // Oferta do proponente
+        System.out.println("Sua oferta: ");
+        double dinheiroOferta = 0;
+        System.out.print("Quanto em dinheiro deseja oferecer? (0 para nenhum): ");
+        try { dinheiroOferta = Double.parseDouble(scanner.nextLine()); } catch (Exception e) {}
+        List<Imovel> imoveisOferta = selecionarImoveis(scanner, this);
+
+        // Pedido ao alvo
+        System.out.println("Pedido para " + alvo.getNome() + ":");
+        double dinheiroPedido = 0;
+        System.out.print("Quanto em dinheiro deseja pedir? (0 para nenhum): ");
+        try { dinheiroPedido = Double.parseDouble(scanner.nextLine()); } catch (Exception e) {}
+        List<Imovel> imoveisPedido = selecionarImoveis(scanner, alvo);
+
+        // Mostra resumo da negociação
+        System.out.println("Resumo da proposta:");
+        System.out.println("Você oferece: R$" + dinheiroOferta + " e imóveis: " + nomesImoveis(imoveisOferta));
+        System.out.println("Em troca de: R$" + dinheiroPedido + " e imóveis: " + nomesImoveis(imoveisPedido));
+        System.out.println(alvo.getNome() + ", aceita a proposta? (1=Sim / 0=Não)");
+        int aceitou = 0;
+        try { aceitou = Integer.parseInt(scanner.nextLine()); } catch (Exception e) {}
+        if (aceitou != 1) {
+            System.out.println("Negociação recusada.");
+            return;
+        }
+        // Validação
+        if (this.getSaldo() < dinheiroOferta) { System.out.println("Você não tem dinheiro suficiente."); return; }
+        if (alvo.getSaldo() < dinheiroPedido) { System.out.println(alvo.getNome() + " não tem dinheiro suficiente."); return; }
+        if (!this.getPropriedades().containsAll(imoveisOferta)) { System.out.println("Você não possui todos os imóveis ofertados."); return; }
+        if (!alvo.getPropriedades().containsAll(imoveisPedido)) { System.out.println(alvo.getNome() + " não possui todos os imóveis pedidos."); return; }
+
+        // Executa troca
+        this.pagar(dinheiroOferta);
+        alvo.receber(dinheiroOferta);
+        alvo.pagar(dinheiroPedido);
+        this.receber(dinheiroPedido);
+        for (Imovel im : imoveisOferta) {
+            this.venderImovel(im);
+            alvo.adquirirImovel(im);
+            im.setDono(alvo);
+        }
+        for (Imovel im : imoveisPedido) {
+            alvo.venderImovel(im);
+            this.adquirirImovel(im);
+            im.setDono(this);
+        }
+        System.out.println("Negociação realizada com sucesso!");
     }
+    private List<Imovel> selecionarImoveis(Scanner scanner, Jogador dono) {
+        List<Imovel> todos = dono.getPropriedades();
+        List<Imovel> selecionados = new ArrayList<>();
+        if (todos.isEmpty()) return selecionados;
+        System.out.println("Imóveis disponíveis:");
+        for (int i = 0; i < todos.size(); i++)
+            System.out.println((i + 1) + ". " + todos.get(i).getNome() + (todos.get(i).isHipotecado() ? " (Hipotecado)" : ""));
+        System.out.println("Digite os números dos imóveis separados por vírgula (ou nada para nenhum): ");
+        String linha = scanner.nextLine().trim();
+        if (linha.isEmpty()) return selecionados;
+        String[] nums = linha.split(",");
+        for (String num : nums) {
+            try {
+                int idx = Integer.parseInt(num.trim()) - 1;
+                if (idx >= 0 && idx < todos.size()) selecionados.add(todos.get(idx));
+            } catch (Exception ignored) {}
+        }
+        return selecionados;
+    }
+
+    private String nomesImoveis(List<Imovel> lista) {
+        if (lista == null || lista.isEmpty()) return "Nenhum";
+        StringBuilder sb = new StringBuilder();
+        for (Imovel im : lista) sb.append(im.getNome()).append(", ");
+        return sb.substring(0, sb.length() - 2);
+    }
+
+
 }

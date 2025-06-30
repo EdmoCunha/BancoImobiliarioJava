@@ -50,6 +50,24 @@ public class BancoImobiliario {
         } while (opcao != 0);
     }
 
+    public void atualizarJogador() {
+        listarJogadores();
+        if (jogadores.isEmpty()) return;
+        System.out.print("Nome do jogador para atualizar: ");
+        String nome = scanner.nextLine();
+        Jogador j = null;
+        for (Jogador jog : jogadores) if (jog.getNome().equalsIgnoreCase(nome)) j = jog;
+        if (j == null) { System.out.println("Jogador não encontrado."); return; }
+        System.out.print("Novo nome (enter para manter): ");
+        String novoNome = scanner.nextLine();
+        if (!novoNome.isBlank()) j.setNome(novoNome);
+        System.out.print("Novo saldo (enter para manter): ");
+        String novoSaldo = scanner.nextLine();
+        if (!novoSaldo.isBlank()) j.setSaldo(Double.parseDouble(novoSaldo));
+        System.out.println("Atualizado.");
+    }
+
+
     // TODO  ----------------- MENU DE JOGADORES -----------------
     public void menuJogadores() {
         int opcao;
@@ -59,14 +77,18 @@ public class BancoImobiliario {
             System.out.println("1. Cadastrar Novo Jogador");
             System.out.println("2. Listar Jogadores");
             System.out.println("3. Remover Jogador");
-            System.out.println("4. Voltar");
+            System.out.println("4. Atualizar Jogador");
+            System.out.println("5. Voltar");
+
             System.out.print(">> ");
             opcao = lerInt();
             switch (opcao) {
                 case 1 -> cadastrarJogador();
                 case 2 -> listarJogadores();
                 case 3 -> removerJogador();
-                case 4 -> {}
+                case 4 -> atualizarJogador();
+                case 5 -> {}
+
                 default -> System.out.println("Opção inválida.");
             }
         } while (opcao != 4);
@@ -314,5 +336,9 @@ public class BancoImobiliario {
     public Tabuleiro getTabuleiro() { return tabuleiro; }
     public Baralho getBaralho() { return baralho; }
     public int getSalarioPorVolta() { return salarioPorVolta; }
+
+    public List<Jogador> getJogadores() {
+        return jogadores;
+    }
 
 }
