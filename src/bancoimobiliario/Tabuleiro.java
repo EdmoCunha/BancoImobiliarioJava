@@ -12,6 +12,11 @@ public class Tabuleiro {
         this.imoveis = new ArrayList<>();
     }
 
+    public List<Imovel> getImoveis() {
+        return imoveis;
+    }
+
+
     public void montarTabuleiroPadrao() {
         // Limpa tabuleiro
         inicio = null;
