@@ -1,5 +1,6 @@
 package bancoimobiliario;
 import java.util.*;
+import bancoimobiliario.Utils;
 
 public class Jogador {
     private String nome;
@@ -186,5 +187,103 @@ public class Jogador {
         return sb.substring(0, sb.length() - 2);
     }
 
+    public void jogarDadosEMover(BancoImobiliario game) {
+        int dado1 = Utils.rolarDado(), dado2 = Utils.rolarDado();
+        int total = dado1 + dado2;
+        System.out.printf("Você tirou %d e %d. Total: %d.\n", dado1, dado2, total);
+        Casa novaCasa = game.getTabuleiro().avancar(this.getPosicao(), total);
+        this.setPosicao(novaCasa);
+        novaCasa.acao(this, game);
+        if (novaCasa instanceof CasaInicio) {
+            this.receber(game.gameConst.salarioPorVolta);
+            System.out.println("Você recebeu salário por completar a volta!");
+        }
+    }
+
+    public static void menuJogadores(List<Jogador> jogadores, GameConst gameConst) {
+        int opcao;
+        do {
+            System.out.println("\n--- Menu de Jogadores ---");
+            System.out.println("(Atualmente: " + jogadores.size() + "/6)");
+            System.out.println("1. Cadastrar Novo Jogador");
+            System.out.println("2. Listar Jogadores");
+            System.out.println("3. Remover Jogador");
+            System.out.println("4. Atualizar Jogador");
+            System.out.println("5. Voltar");
+
+            System.out.print(">> ");
+            opcao = Utils.lerInt();
+            switch (opcao) {
+                case 1 -> cadastrarJogador(jogadores, gameConst);
+                case 2 -> listarJogadores(jogadores);
+                case 3 -> removerJogador(jogadores);
+                case 4 -> atualizarJogador(jogadores);
+                case 5 -> {
+                    return;
+                }
+
+                default -> System.out.println("Opção inválida.");
+            }
+        } while (opcao != 4);
+    }
+
+    public static void cadastrarJogador(List<Jogador> jogadores, GameConst gameConst) {
+        if (jogadores.size() >= 6) {
+            System.out.println("Limite de jogadores atingido!");
+            return;
+        }
+        System.out.print("Nome do novo jogador: ");
+        Scanner scanner = new Scanner(System.in);
+        String nome = scanner.nextLine().trim();
+        Jogador novo = new Jogador(nome, gameConst.saldoInicial);
+        jogadores.add(novo);
+        System.out.println("Jogador '" + nome + "' cadastrado.");
+    }
+
+    public static void listarJogadores(List<Jogador> jogadores) {
+        if (jogadores.isEmpty()) {
+            System.out.println("Nenhum jogador cadastrado.");
+            return;
+        }
+        System.out.println("--- Jogadores ---");
+        int i = 1;
+        for (Jogador j : jogadores) {
+            System.out.printf("%d. %s - Saldo: R$ %.2f\n", i++, j.getNome(), j.getSaldo());
+        }
+    }
+
+    public static void removerJogador(List<Jogador> jogadores) {
+        listarJogadores(jogadores);
+        if (jogadores.isEmpty()) return;
+        System.out.print("Nome do jogador a remover: ");
+        Scanner scanner = new Scanner(System.in);
+        String nome = scanner.nextLine();
+        Jogador remove = null;
+        for (Jogador j : jogadores) if (j.getNome().equalsIgnoreCase(nome)) remove = j;
+        if (remove != null) {
+            jogadores.remove(remove);
+            System.out.println("Removido.");
+        } else {
+            System.out.println("Não encontrado.");
+        }
+    }
+
+    public static void atualizarJogador(List<Jogador> jogadores) {
+        listarJogadores(jogadores);
+        if (jogadores.isEmpty()) return;
+        System.out.print("Nome do jogador para atualizar: ");
+        Scanner scanner = new Scanner(System.in);
+        String nome = scanner.nextLine();
+        Jogador j = null;
+        for (Jogador jog : jogadores) if (jog.getNome().equalsIgnoreCase(nome)) j = jog;
+        if (j == null) { System.out.println("Jogador não encontrado."); return; }
+        System.out.print("Novo nome (enter para manter): ");
+        String novoNome = scanner.nextLine();
+        if (!novoNome.isBlank()) j.setNome(novoNome);
+        System.out.print("Novo saldo (enter para manter): ");
+        String novoSaldo = scanner.nextLine();
+        if (!novoSaldo.isBlank()) j.setSaldo(Double.parseDouble(novoSaldo));
+        System.out.println("Atualizado.");
+    }
 
 }

@@ -96,7 +96,7 @@ public class Baralho {
             System.out.println("Você recebeu uma restituição dobrada!");
         }));
         cartasBase.add(new Carta("Sorte! Jogue novamente.", (j, jogo) -> {
-            jogo.jogarDadosEMover(j);
+            j.jogarDadosEMover(jogo);
         }));
         cartasBase.add(new Carta("Desconto! Na próxima compra, pague metade.", (j, jogo) -> {
             j.receber(0.5 * jogo.getSalarioPorVolta());
