@@ -18,7 +18,7 @@ public class BancoImobiliario {
         ranking = new RankingJogadores();
         scanner = new Scanner(System.in);
         gameConst = new GameConst();
-        gameConst.saldoInicial = 25000;
+        gameConst.saldoInicial = 250000;
         gameConst.salarioPorVolta = 2000;
         gameConst.maxRodadas = 20;
         gameConst.rodadaAtual = 1;
@@ -35,7 +35,13 @@ public class BancoImobiliario {
             System.out.print(">> ");
             opcao = Utils.lerInt();
             switch (opcao) {
-                case 1 -> { System.out.print("Novo saldo inicial: "); gameConst.saldoInicial = Utils.lerInt(); }
+                case 1 -> {
+                    System.out.print("Novo saldo inicial: ");
+                    this.gameConst.saldoInicial = Utils.lerInt();
+                    for (Jogador j : this.jogadores) {
+                      j.setSaldo(this.gameConst.saldoInicial);
+                    }
+                }
                 case 2 -> { System.out.print("Novo salário por volta: "); gameConst.salarioPorVolta = Utils.lerInt(); }
                 case 3 -> { System.out.print("Novo nº de rodadas: "); gameConst.maxRodadas = Utils.lerInt(); }
                 case 4 -> {}
@@ -57,10 +63,12 @@ public class BancoImobiliario {
         baralho.embaralhar();
         for (Jogador j : jogadores) j.setPosicao(tabuleiro.getCasaInicio());
         gameConst.rodadaAtual = 1;
-        while (gameConst.rodadaAtual <= gameConst.maxRodadas && jogadores.stream().filter(j -> !j.isFalido()).count() > 1) {
+        while (gameConst.rodadaAtual <= gameConst.maxRodadas && this.getJogadoresValidos().size() > 1) {
             for (Jogador jogador : jogadores) {
                 if (!jogador.isFalido()) {
-                    executarTurno(jogador);
+                    if(!executarTurno(jogador)) {
+                        break;
+                    }
                 }
             }
             ranking.reconstruir(jogadores);
@@ -69,11 +77,15 @@ public class BancoImobiliario {
         encerrarJogo();
     }
 
-    public void executarTurno(Jogador jogador) {
+    public boolean executarTurno(Jogador jogador) {
         System.out.println("\n=== RODADA " + gameConst.rodadaAtual + "/" + gameConst.maxRodadas + " - VEZ DE: " + jogador.getNome() + " ===");
         if (jogador.isPreso()) {
             menuPrisao(jogador);
-            return;
+            return true;
+        }
+        if (jogador.isFalido()) {
+            System.out.println(jogador.getNome() + " faliu...");
+            return true;
         }
         int opcao;
         do {
@@ -87,12 +99,18 @@ public class BancoImobiliario {
             System.out.print(">> ");
             opcao = Utils.lerInt();
             switch (opcao) {
-                case 1 -> {jogador.jogarDadosEMover(this); return; }
+                case 1 -> {jogador.jogarDadosEMover(this); return true; }
                 case 2 -> jogador.mostrarStatus();
                 case 3 -> jogador.menuGerenciarPropriedades(scanner, tabuleiro);
                 case 4 -> jogador.menuNegociacao(scanner, jogadores, tabuleiro);
                 case 5 -> ranking.exibirRanking();
-                case 0 -> jogador.setFalido(true);
+                case 0 -> {
+                    jogador.setFalido(true);
+                    if (this.getJogadoresValidos().size() <= 1) {
+                        return false;
+                    }
+                    return true;
+                }
                 default -> System.out.println("Opção inválida.");
             }
         } while (true);
@@ -137,6 +155,10 @@ public class BancoImobiliario {
         ranking.exibirRanking();
         Jogador vencedor = ranking.getVencedor();
         System.out.println("VENCEDOR(A): " + vencedor.getNome() + " - Patrimônio: R$ " + vencedor.getPatrimonio());
+
+        for (Jogador j : this.jogadores) {
+            j.resetPlayer(this.gameConst);
+        }
     }
 
     // --- Getters para uso em outras classes ---
@@ -145,6 +167,9 @@ public class BancoImobiliario {
     public int getSalarioPorVolta() { return gameConst.salarioPorVolta; }
     public List<Jogador> getJogadores() {
         return jogadores;
+    }
+    public List<Jogador> getJogadoresValidos() {
+        return this.jogadores.stream().filter(j -> !j.isFalido()).toList();
     }
 
 }

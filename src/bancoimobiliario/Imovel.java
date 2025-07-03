@@ -34,7 +34,9 @@ public class Imovel {
 
     public void acaoNaCasa(Jogador jogador, BancoImobiliario jogo) {
         if (dono == null) {
+            System.out.println("Imóvel: "+this.nome);
             System.out.println("Este imóvel não tem proprietário.");
+            jogador.mostrarStatus();
             System.out.println("Preço: R$ " + preco + " | Aluguel: R$ " + aluguel);
             System.out.println("1. Comprar | 2. Passar");
             int op = Utils.lerInt();

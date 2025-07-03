@@ -10,6 +10,7 @@ public class Jogador {
     private boolean falido;
     private boolean preso;
     private int tentativasPrisao;
+    private int passos;
 
     public Jogador(String nome, double saldoInicial) {
         this.nome = nome;
@@ -19,6 +20,7 @@ public class Jogador {
         this.falido = false;
         this.preso = false;
         this.tentativasPrisao = 0;
+        this.passos = 0;
     }
     public void setNome(String nome) { this.nome = nome; }
     public void setSaldo(double saldo) { this.saldo = saldo; }
@@ -193,11 +195,22 @@ public class Jogador {
         System.out.printf("Você tirou %d e %d. Total: %d.\n", dado1, dado2, total);
         Casa novaCasa = game.getTabuleiro().avancar(this.getPosicao(), total);
         this.setPosicao(novaCasa);
+        this.passos += total;
         novaCasa.acao(this, game);
-        if (novaCasa instanceof CasaInicio) {
+        if (this.passos >= game.getTabuleiro().getTotalCasas()) {
             this.receber(game.gameConst.salarioPorVolta);
             System.out.println("Você recebeu salário por completar a volta!");
+            this.passos = 0;
         }
+    }
+
+    public void resetPlayer(GameConst consts) {
+        this.setFalido(false);
+        this.sairPrisao();
+        this.setSaldo(consts.saldoInicial);
+        this.setPosicao(null);
+        this.propriedades = new ArrayList<>();
+        this.passos = 0;
     }
 
     public static void menuJogadores(List<Jogador> jogadores, GameConst gameConst) {

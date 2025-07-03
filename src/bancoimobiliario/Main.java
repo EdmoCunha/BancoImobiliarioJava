@@ -10,16 +10,16 @@ public class Main {
 
         int opcao;
         BancoImobiliario game = new BancoImobiliario();
-        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Hospital", (double) 200000, (double) 2000);
+        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Hospital", (double) 400000, (double) 4000);
         Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Farmácia", (double) 300000, (double) 3000);
         Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Escola", (double) 300000, (double) 3000);
         Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Universidade", (double) 400000, (double) 4000);
-        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Casa", (double) 0, (double) 0);
-        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Bordel", (double) 0, (double) 0);
-        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Hotel", (double) 0, (double) 0);
-        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Restaurante", (double) 0, (double) 0);
-        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Mercado", (double) 0, (double) 0);
-        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Posto de gasolina", (double) 0, (double) 0);
+        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Casa", (double) 100000, (double) 1000);
+        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Bordel", (double) 150000, (double) 1500);
+        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Hotel", (double) 500000, (double) 5000);
+        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Restaurante", (double) 250000, (double) 2500);
+        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Mercado", (double) 300000, (double) 3000);
+        Imovel.cadastrarImovelMocado(game.getTabuleiro(), "Posto de gasolina", (double) 120000, (double) 1200);
 
         do {
             System.out.println("\n=== SIMULADOR DE JOGO DE TABULEIRO ===");
