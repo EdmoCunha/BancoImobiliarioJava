@@ -16,7 +16,6 @@ public class Tabuleiro {
         return imoveis;
     }
 
-
     public void montarTabuleiroPadrao() {
         // Limpa tabuleiro
         inicio = null;
@@ -102,5 +101,9 @@ public class Tabuleiro {
 
     public Casa getCasaInicio() {
         return inicio;
+    }
+
+    public int getTotalCasas() {
+        return totalCasas;
     }
 }

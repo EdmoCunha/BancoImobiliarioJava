@@ -1,5 +1,6 @@
 package bancoimobiliario;
 import java.util.*;
+import bancoimobiliario.Utils;
 
 public class BancoImobiliario {
     private Tabuleiro tabuleiro;
@@ -7,10 +8,8 @@ public class BancoImobiliario {
     private Baralho baralho;
     private RankingJogadores ranking;
     private Scanner scanner;
-    private int saldoInicial;
-    private int salarioPorVolta;
-    private int maxRodadas;
-    private int rodadaAtual;
+    public GameConst gameConst;
+
 
     public BancoImobiliario() {
         tabuleiro = new Tabuleiro();
@@ -18,196 +17,39 @@ public class BancoImobiliario {
         baralho = new Baralho();
         ranking = new RankingJogadores();
         scanner = new Scanner(System.in);
-        saldoInicial = 25000;
-        salarioPorVolta = 2000;
-        maxRodadas = 20;
-        rodadaAtual = 1;
+        gameConst = new GameConst();
+        gameConst.saldoInicial = 750000;
+        gameConst.salarioPorVolta = 10000;
+        gameConst.maxRodadas = 20;
+        gameConst.rodadaAtual = 1;
     }
-
-    public static void main(String[] args) {
-        new BancoImobiliario().menuPrincipal();
-    }
-
-    public void menuPrincipal() {
-        int opcao;
-        do {
-            System.out.println("\n=== SIMULADOR DE JOGO DE TABULEIRO ===");
-            System.out.println("1. Gerenciar Jogadores");
-            System.out.println("2. Gerenciar Imóveis");
-            System.out.println("3. Definir Configurações da Partida");
-            System.out.println("4. Iniciar Jogo");
-            System.out.println("0. Sair");
-            System.out.print(">> Escolha uma opção: ");
-            opcao = lerInt();
-            switch (opcao) {
-                case 1 -> menuJogadores();
-                case 2 -> menuImoveis();
-                case 3 -> menuConfiguracoes();
-                case 4 -> iniciarJogo();
-                case 0 -> System.out.println("Saindo...");
-                default -> System.out.println("Opção inválida.");
-            }
-        } while (opcao != 0);
-    }
-
-    public void atualizarJogador() {
-        listarJogadores();
-        if (jogadores.isEmpty()) return;
-        System.out.print("Nome do jogador para atualizar: ");
-        String nome = scanner.nextLine();
-        Jogador j = null;
-        for (Jogador jog : jogadores) if (jog.getNome().equalsIgnoreCase(nome)) j = jog;
-        if (j == null) { System.out.println("Jogador não encontrado."); return; }
-        System.out.print("Novo nome (enter para manter): ");
-        String novoNome = scanner.nextLine();
-        if (!novoNome.isBlank()) j.setNome(novoNome);
-        System.out.print("Novo saldo (enter para manter): ");
-        String novoSaldo = scanner.nextLine();
-        if (!novoSaldo.isBlank()) j.setSaldo(Double.parseDouble(novoSaldo));
-        System.out.println("Atualizado.");
-    }
-
-
-    // TODO  ----------------- MENU DE JOGADORES -----------------
-    public void menuJogadores() {
-        int opcao;
-        do {
-            System.out.println("\n--- Menu de Jogadores ---");
-            System.out.println("(Atualmente: " + jogadores.size() + "/6)");
-            System.out.println("1. Cadastrar Novo Jogador");
-            System.out.println("2. Listar Jogadores");
-            System.out.println("3. Remover Jogador");
-            System.out.println("4. Atualizar Jogador");
-            System.out.println("5. Voltar");
-
-            System.out.print(">> ");
-            opcao = lerInt();
-            switch (opcao) {
-                case 1 -> cadastrarJogador();
-                case 2 -> listarJogadores();
-                case 3 -> removerJogador();
-                case 4 -> atualizarJogador();
-                case 5 -> {}
-
-                default -> System.out.println("Opção inválida.");
-            }
-        } while (opcao != 4);
-    }
-
-    public void cadastrarJogador() {
-        if (jogadores.size() >= 6) {
-            System.out.println("Limite de jogadores atingido!");
-            return;
-        }
-        System.out.print("Nome do novo jogador: ");
-        String nome = scanner.nextLine().trim();
-        Jogador novo = new Jogador(nome, saldoInicial);
-        jogadores.add(novo);
-        System.out.println("Jogador '" + nome + "' cadastrado.");
-    }
-
-    public void listarJogadores() {
-        if (jogadores.isEmpty()) {
-            System.out.println("Nenhum jogador cadastrado.");
-            return;
-        }
-        System.out.println("--- Jogadores ---");
-        int i = 1;
-        for (Jogador j : jogadores) {
-            System.out.printf("%d. %s - Saldo: R$ %.2f\n", i++, j.getNome(), j.getSaldo());
-        }
-    }
-
-    public void removerJogador() {
-        listarJogadores();
-        if (jogadores.isEmpty()) return;
-        System.out.print("Nome do jogador a remover: ");
-        String nome = scanner.nextLine();
-        Jogador remove = null;
-        for (Jogador j : jogadores) if (j.getNome().equalsIgnoreCase(nome)) remove = j;
-        if (remove != null) {
-            jogadores.remove(remove);
-            System.out.println("Removido.");
-        } else {
-            System.out.println("Não encontrado.");
-        }
-    }
-
-    // TODO ----------------- MENU DE IMÓVEIS -----------------
-    public void menuImoveis() {
-        int opcao;
-        do {
-            System.out.println("\n--- Menu de Imóveis ---");
-            System.out.println("(Atualmente: " + tabuleiro.getQtdImoveis() + "/40)");
-            System.out.println("1. Cadastrar Novo Imóvel");
-            System.out.println("2. Listar Imóveis");
-            System.out.println("3. Atualizar Imóvel");
-            System.out.println("4. Remover Imóvel");
-            System.out.println("5. Voltar");
-            System.out.print(">> ");
-            opcao = lerInt();
-            switch (opcao) {
-                case 1 -> cadastrarImovel();
-                case 2 -> tabuleiro.listarImoveis();
-                case 3 -> atualizarImovel();
-                case 4 -> removerImovel();
-                case 5 -> {}
-                default -> System.out.println("Opção inválida.");
-            }
-        } while (opcao != 5);
-    }
-
-    public void cadastrarImovel() {
-        if (tabuleiro.getQtdImoveis() >= 40) {
-            System.out.println("Limite de imóveis atingido!");
-            return;
-        }
-        System.out.print("Nome do imóvel: ");
-        String nome = scanner.nextLine();
-        System.out.print("Preço de compra: ");
-        double preco = lerDouble();
-        System.out.print("Valor do aluguel: ");
-        double aluguel = lerDouble();
-        tabuleiro.criarImovel(nome, preco, aluguel);
-        System.out.println("Imóvel cadastrado.");
-    }
-
-    public void atualizarImovel() {
-        tabuleiro.listarImoveis();
-        System.out.print("Digite o nome do imóvel para atualizar: ");
-        String nome = scanner.nextLine();
-        tabuleiro.atualizarImovel(nome, scanner);
-    }
-
-    public void removerImovel() {
-        tabuleiro.listarImoveis();
-        System.out.print("Digite o nome do imóvel para remover: ");
-        String nome = scanner.nextLine();
-        tabuleiro.removerImovel(nome);
-    }
-
 
     public void menuConfiguracoes() {
         int opcao;
         do {
             System.out.println("--- Configurações da Partida ---");
-            System.out.println("1. Definir Saldo Inicial (Atual: R$ " + saldoInicial + ")");
-            System.out.println("2. Definir Salário por volta (Atual: R$ " + salarioPorVolta + ")");
-            System.out.println("3. Definir Nº Máximo de Rodadas (Atual: " + maxRodadas + ")");
+            System.out.println("1. Definir Saldo Inicial (Atual: R$ " + gameConst.saldoInicial + ")");
+            System.out.println("2. Definir Salário por volta (Atual: R$ " + gameConst.salarioPorVolta + ")");
+            System.out.println("3. Definir Nº Máximo de Rodadas (Atual: " + gameConst.maxRodadas + ")");
             System.out.println("4. Voltar");
             System.out.print(">> ");
-            opcao = lerInt();
+            opcao = Utils.lerInt();
             switch (opcao) {
-                case 1 -> { System.out.print("Novo saldo inicial: "); saldoInicial = lerInt(); }
-                case 2 -> { System.out.print("Novo salário por volta: "); salarioPorVolta = lerInt(); }
-                case 3 -> { System.out.print("Novo nº de rodadas: "); maxRodadas = lerInt(); }
+                case 1 -> {
+                    System.out.print("Novo saldo inicial: ");
+                    this.gameConst.saldoInicial = Utils.lerInt();
+                    for (Jogador j : this.jogadores) {
+                      j.setSaldo(this.gameConst.saldoInicial);
+                    }
+                }
+                case 2 -> { System.out.print("Novo salário por volta: "); gameConst.salarioPorVolta = Utils.lerInt(); }
+                case 3 -> { System.out.print("Novo nº de rodadas: "); gameConst.maxRodadas = Utils.lerInt(); }
                 case 4 -> {}
                 default -> System.out.println("Opção inválida.");
             }
         } while (opcao != 4);
     }
 
-    // TODO  ----------------- INICIAR JOGO -----------------
     public void iniciarJogo() {
         if (tabuleiro.getQtdImoveis() < 10) {
             System.out.println("ERRO: Mínimo de 10 imóveis necessários.");
@@ -220,24 +62,30 @@ public class BancoImobiliario {
         tabuleiro.montarTabuleiroPadrao();
         baralho.embaralhar();
         for (Jogador j : jogadores) j.setPosicao(tabuleiro.getCasaInicio());
-        rodadaAtual = 1;
-        while (rodadaAtual <= maxRodadas && jogadores.stream().filter(j -> !j.isFalido()).count() > 1) {
+        gameConst.rodadaAtual = 1;
+        while (gameConst.rodadaAtual <= gameConst.maxRodadas && this.getJogadoresValidos().size() > 1) {
             for (Jogador jogador : jogadores) {
                 if (!jogador.isFalido()) {
-                    executarTurno(jogador);
+                    if(!executarTurno(jogador)) {
+                        break;
+                    }
                 }
             }
             ranking.reconstruir(jogadores);
-            rodadaAtual++;
+            gameConst.rodadaAtual++;
         }
         encerrarJogo();
     }
 
-    public void executarTurno(Jogador jogador) {
-        System.out.println("\n=== RODADA " + rodadaAtual + "/" + maxRodadas + " - VEZ DE: " + jogador.getNome() + " ===");
+    public boolean executarTurno(Jogador jogador) {
+        System.out.println("\n=== RODADA " + gameConst.rodadaAtual + "/" + gameConst.maxRodadas + " - VEZ DE: " + jogador.getNome() + " ===");
         if (jogador.isPreso()) {
             menuPrisao(jogador);
-            return;
+            return true;
+        }
+        if (jogador.isFalido()) {
+            System.out.println(jogador.getNome() + " faliu...");
+            return true;
         }
         int opcao;
         do {
@@ -249,45 +97,38 @@ public class BancoImobiliario {
             System.out.println("5. Ver Ranking");
             System.out.println("0. Desistir do Jogo");
             System.out.print(">> ");
-            opcao = lerInt();
+            opcao = Utils.lerInt();
             switch (opcao) {
-                case 1 -> { jogarDadosEMover(jogador); return; }
+                case 1 -> {jogador.jogarDadosEMover(this); return true; }
                 case 2 -> jogador.mostrarStatus();
                 case 3 -> jogador.menuGerenciarPropriedades(scanner, tabuleiro);
                 case 4 -> jogador.menuNegociacao(scanner, jogadores, tabuleiro);
                 case 5 -> ranking.exibirRanking();
-                case 0 -> jogador.setFalido(true);
+                case 0 -> {
+                    jogador.setFalido(true);
+                    if (this.getJogadoresValidos().size() <= 1) {
+                        return false;
+                    }
+                    return true;
+                }
                 default -> System.out.println("Opção inválida.");
             }
         } while (true);
-    }
-
-    public void jogarDadosEMover(Jogador jogador) {
-        int dado1 = rolarDado(), dado2 = rolarDado();
-        int total = dado1 + dado2;
-        System.out.printf("Você tirou %d e %d. Total: %d.\n", dado1, dado2, total);
-        Casa novaCasa = tabuleiro.avancar(jogador.getPosicao(), total);
-        jogador.setPosicao(novaCasa);
-        novaCasa.acao(jogador, this);
-        if (novaCasa instanceof CasaInicio) {
-            jogador.receber(salarioPorVolta);
-            System.out.println("Você recebeu salário por completar a volta!");
-        }
     }
 
     public void menuPrisao(Jogador jogador) {
         System.out.println("Você está na prisão! (" + (jogador.getTentativasPrisao() + 1) + "ª tentativa)");
         System.out.println("1. Tentar a sorte (dados duplos)");
         System.out.println("2. Passar a vez");
-        int opcao = lerInt();
+        int opcao = Utils.lerInt();
         if (opcao == 1) {
-            int d1 = rolarDado(), d2 = rolarDado();
+            int d1 = Utils.rolarDado(), d2 = Utils.rolarDado();
             System.out.println("Você tirou: " + d1 + " e " + d2);
             if (d1 == d2) {
                 System.out.println("Dados duplos! Você está livre.");
                 jogador.sairPrisao();
                 jogador.setTentativasPrisao(0);
-                jogarDadosEMover(jogador);
+                jogador.jogarDadosEMover(this);
             } else {
                 jogador.incrementarTentativasPrisao();
                 if (jogador.getTentativasPrisao() >= 3) {
@@ -314,31 +155,26 @@ public class BancoImobiliario {
         ranking.exibirRanking();
         Jogador vencedor = ranking.getVencedor();
         System.out.println("VENCEDOR(A): " + vencedor.getNome() + " - Patrimônio: R$ " + vencedor.getPatrimonio());
+
+        for (Jogador j : this.jogadores) {
+            j.resetPlayer(this.gameConst);
+        }
+        for (Imovel i : this.tabuleiro.getImoveis()) {
+            i.setDono(null);
+            i.quitarHipoteca();
+        }
+
     }
 
-    private int rolarDado() {
-        return 1 + new Random().nextInt(6);
-    }
-
-    int lerInt() {
-        while (true) {
-            try { return Integer.parseInt(scanner.nextLine().trim()); }
-            catch (Exception e) { System.out.print("Inválido, tente de novo: "); }
-        }
-    }
-    private double lerDouble() {
-        while (true) {
-            try { return Double.parseDouble(scanner.nextLine().replace(",", ".").trim()); }
-            catch (Exception e) { System.out.print("Inválido, tente de novo: "); }
-        }
-    }
     // --- Getters para uso em outras classes ---
     public Tabuleiro getTabuleiro() { return tabuleiro; }
     public Baralho getBaralho() { return baralho; }
-    public int getSalarioPorVolta() { return salarioPorVolta; }
-
+    public int getSalarioPorVolta() { return gameConst.salarioPorVolta; }
     public List<Jogador> getJogadores() {
         return jogadores;
+    }
+    public List<Jogador> getJogadoresValidos() {
+        return this.jogadores.stream().filter(j -> !j.isFalido()).toList();
     }
 
 }

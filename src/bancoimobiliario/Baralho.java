@@ -46,6 +46,7 @@ public class Baralho {
             System.out.println("Você pagou R$ 800 para cada jogador!");
         }));
         cartasBase.add(new Carta("Ganhe um imóvel grátis! Escolha pelo nome.", (j, jogo) -> {
+            jogo.getTabuleiro().listarImoveis();
             System.out.print("Digite o nome do imóvel desejado: ");
             Scanner sc = new Scanner(System.in);
             String nome = sc.nextLine();
@@ -96,14 +97,13 @@ public class Baralho {
             System.out.println("Você recebeu uma restituição dobrada!");
         }));
         cartasBase.add(new Carta("Sorte! Jogue novamente.", (j, jogo) -> {
-            jogo.jogarDadosEMover(j);
+            j.jogarDadosEMover(jogo);
         }));
         cartasBase.add(new Carta("Desconto! Na próxima compra, pague metade.", (j, jogo) -> {
             j.receber(0.5 * jogo.getSalarioPorVolta());
             System.out.println("Você recebeu desconto de metade do salário.");
         }));
     }
-
 
     public void embaralhar() {
         pilha.clear();
