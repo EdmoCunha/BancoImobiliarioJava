@@ -18,8 +18,8 @@ public class BancoImobiliario {
         ranking = new RankingJogadores();
         scanner = new Scanner(System.in);
         gameConst = new GameConst();
-        gameConst.saldoInicial = 250000;
-        gameConst.salarioPorVolta = 2000;
+        gameConst.saldoInicial = 750000;
+        gameConst.salarioPorVolta = 10000;
         gameConst.maxRodadas = 20;
         gameConst.rodadaAtual = 1;
     }
@@ -159,6 +159,11 @@ public class BancoImobiliario {
         for (Jogador j : this.jogadores) {
             j.resetPlayer(this.gameConst);
         }
+        for (Imovel i : this.tabuleiro.getImoveis()) {
+            i.setDono(null);
+            i.quitarHipoteca();
+        }
+
     }
 
     // --- Getters para uso em outras classes ---

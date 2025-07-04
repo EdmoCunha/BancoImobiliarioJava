@@ -1,6 +1,7 @@
 package bancoimobiliario;
 import bancoimobiliario.Utils;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Imovel {
@@ -17,20 +18,16 @@ public class Imovel {
         this.dono = null;
         this.hipotecado = false;
     }
-    public void setNome(String nome) { this.nome = nome; }
 
+    public void setNome(String nome) { this.nome = nome; }
     public String getNome() { return nome; }
     public double getPreco() { return preco; }
     public double getAluguel() { return aluguel; }
     public Jogador getDono() { return dono; }
     public boolean isHipotecado() { return hipotecado; }
-
     public void setPreco(double preco) { this.preco = preco; }
     public void setAluguel(double aluguel) { this.aluguel = aluguel; }
-
-
     public void setDono(Jogador j) { this.dono = j; }
-
 
     public void acaoNaCasa(Jogador jogador, BancoImobiliario jogo) {
         if (dono == null) {
@@ -128,5 +125,6 @@ public class Imovel {
         String nome = scanner.nextLine();
         tabuleiro.removerImovel(nome);
     }
+
 
 }
