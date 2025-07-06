@@ -33,7 +33,6 @@
 +3. Ao mover o peão, a casa correspondente executa sua ação: cobrança de aluguel, sorte/revés, prisão, imposto etc.
 +4. A cada volta completa, o jogador recebe o salário definido nas configurações.
 +5. O jogo termina quando atingir o número máximo de rodadas ou restar apenas um participante. O ranking final é exibido e o vencedor é aquele com maior patrimônio.
-+
- 
-EOF
-)
++6. Ele roda com uma Lista Circular onde o ultimo Nó sempre aponta para o inicio.
++7. Próximo passo é integrar ele com React pra deixar com uma interface amigável.
++8.Projeto feito por EdmoCunha, Jose-Edu e Bernardo.
