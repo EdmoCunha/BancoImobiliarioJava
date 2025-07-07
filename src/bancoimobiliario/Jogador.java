@@ -65,6 +65,13 @@ public class Jogador {
     }
 
     public void menuGerenciarPropriedades(Scanner scanner, Tabuleiro tabuleiro) {
+
+        if (this.propriedades.isEmpty()) {
+            System.out.println("Você não possui propriedades para gerenciar...");
+            System.out.println();
+            return;
+        }
+
         System.out.println("--- Minhas Propriedades ---");
         for (int i = 0; i < propriedades.size(); i++) {
             Imovel im = propriedades.get(i);
